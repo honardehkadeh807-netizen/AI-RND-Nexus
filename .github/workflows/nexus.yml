@@ -2,8 +2,8 @@ name: Dark Nexus Execution
 
 on:
   schedule:
-    - cron: '0 */4 * * *' # اجرا هر 4 ساعت
-  workflow_dispatch: # برای اجرای دستی با یک کلیک
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,10 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
@@ -36,11 +36,9 @@ jobs:
         import os, base64, hashlib, zipfile
         from cryptography.fernet import Fernet
         
-        # ساخت کلید امن
         key = base64.urlsafe_b64encode(hashlib.sha256(os.environ['MASTER_KEY'].encode()).digest())
         cipher = Fernet(key)
         
-        # بازگشایی و خروج از حالت زیپ
         with open('core.enc', 'rb') as f:
             decrypted_data = cipher.decrypt(f.read())
         with open('temp_core.zip', 'wb') as f:
@@ -49,15 +47,11 @@ jobs:
         with zipfile.ZipFile('temp_core.zip', 'r') as zip_ref:
             zip_ref.extractall('live_core')
             
-        # پاک کردن فایل زیپ برای امنیت
         os.remove('temp_core.zip')
         "
-        # وارد پوشه موقت شده و سیستم را استارت می زنیم
         cd live_core
-        # انتقال فایل وضعیت به کنار کدهای اجرایی
         cp ../state.locked ./ || echo "{}" > state.locked
         python main.py
-        # برگرداندن فایل وضعیت جدید برای ذخیره در گیت هاب
         cp state.locked ../
 
     - name: Commit Updated State (Checkpointing)
