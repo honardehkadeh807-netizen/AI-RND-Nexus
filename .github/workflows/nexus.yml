@@ -25,6 +25,7 @@ jobs:
 
     - name: Decrypt and Run Nexus (In RAM Execution)
       env:
+        PYTHONUNBUFFERED: "1" # نمایش آنی لاگ‌ها در کنسول گیت‌هاب
         MASTER_KEY: ${{ secrets.MASTER_KEY }}
         GEMINI_KEYS: ${{ secrets.GEMINI_KEYS }}
         GROQ_KEYS: ${{ secrets.GROQ_KEYS }}
